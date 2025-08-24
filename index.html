@@ -103,7 +103,7 @@
                     if (click){
                         menu.show = menu.show ? false : true;
                     }
-                    console.log(menu.show)
+                    console.log(click);
                 }
             },
             // Add a property to track the current x position of the menu panel
@@ -159,7 +159,9 @@
                 text("nothin else yet", this.panelX + 27, 142);
                 fill(0,0,0);
                 text("nothin else yet", this.panelX + 25, 140);
-
+                
+                menu.button.draw();
+                menu.button.update(); 
             },
         };
 
@@ -171,7 +173,7 @@
                     nid: 0,     //number id
                     handler: {
                         draw: function(){
-
+                            background(220);
                         },
                         update: function(){
 
@@ -181,7 +183,6 @@
             ],
             update: function (){
                 let scene = this.list[this.curScene];
-                console.log(scene);
                 scene.handler.draw();
                 scene.handler.update();
             },
@@ -197,14 +198,12 @@
                 }
             },
         };
-
+        // ALWAYS END WITH MENU THEN USER
         function draw() {
             background(220);
-            menu.button.draw();
-            menu.button.update();
-            menu.update();
-            user.update();
             scenes.update();
+            menu.update();       
+            user.update();
         }
 
         function windowResized() {
