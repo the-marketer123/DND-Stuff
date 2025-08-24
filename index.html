@@ -253,6 +253,9 @@
                             fill(0,0,0);
                             textSize(50);
                             text(char.name, 10, 10, 240)
+                            if (user.mX>=x+10&&user.mX<=x+220&&user.mY>=y&&user.mY<=y+50&&user.mC) {
+                                startEditing(index,"name", x+70-window.scrollX, y-2-window.scrollY, 120, 20, char.name);
+                            }
 
                             let h = 0; //keeps everything at the right height so nothing overlaps if its too long
 
@@ -289,31 +292,34 @@
 
                             textSize(17);
                             text("Race: "+ char.race, 7, h);
-                            if (user.mX>=x+57&&user.mX<=x+87&&user.mY>=y+h-10&&user.mY<=y+h&&user.mC) {
+                            if (user.mX>=x+57&&user.mX<=x+87&&user.mY>=y+h&&user.mY<=y+h+10&&user.mC) {
                                 startEditing(index,"race", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.race);
                             }
                             h+=20;
                             text("Class: "+ char.class, 7, h);
-                            if (user.mX>=x+57&&user.mX<=x+87&&user.mY>=y+h-10&&user.mY<=y+h&&user.mC) {
+                            if (user.mX>=x+57&&user.mX<=x+87&&user.mY>=y+h&&user.mY<=y+h+10&&user.mC) {
                                 startEditing(index,"class", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.class);
                             }
 
 
                             h+=20;
                             text("Mana: "+ char.mana + "/" + char.maxMana, 7, h);
-                            if (user.mX>=x+57&&user.mX<=x+77&&user.mY>=y+h-0&&user.mY<=y+h+10&&user.mC) {
+                            if (user.mX>=x+57&&user.mX<=x+77&&user.mY>=y+h&&user.mY<=y+h+10&&user.mC) {
                                 startEditing(index,"mana", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.mana);
                             }
-                            if (user.mX>=x+85&&user.mX<=x+105&&user.mY>=y+h-0&&user.mY<=y+h+10&&user.mC) {
-                                startEditing(index,"mana", x+70-window.scrollX, h-2-window.scrollY, 120, 20, char.mana);
+                            if (user.mX>=x+85&&user.mX<=x+105&&user.mY>=y+h&&user.mY<=y+h+10&&user.mC) {
+                                startEditing(index,"maxMana", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.maxMana);
                             }
 
                             h+=20;
                             text("Money: "+ char.money, 7, h);
+                            if (user.mX>=x+65&&user.mX<=x+85&&user.mY>=y+h&&user.mY<=y+h+10&&user.mC) {
+                                startEditing(index,"money", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.money);
+                            }
 
                             h+=20;
                             text("Inventory: ", 7, h);
-                            h+=10;
+                            h+=15;
                             fill(150);
                             rect(10,h,230,150,5);
                             
@@ -325,7 +331,7 @@
                             fill(0);
                             h+=170;
                             text("Spells: ", 7, h);
-                            h+=10;
+                            h+=15;
                             fill(150);
                             rect(10,h,230,150,5);
 
