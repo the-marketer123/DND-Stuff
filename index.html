@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DnD Manager</title>
+    <!-- p5.js -->
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.8/lib/p5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.8/lib/addons/p5.sound.min.js"></script>
+    <style>
+        html, body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        }
+        canvas {
+        display: block;
+        }
+    </style>
+</head>
+<body>
+    <script>
+
+        /* Prerequisites */
+            let uiCanvas;
+            let user;
+
+            function setup() {
+            uiCanvas = createCanvas(windowWidth, windowHeight).elt;
+
+            user = (function (controls) {
+                controls.mX = controls.mY = 0;
+                controls.mP = controls.mC = false;
+                controls.kH = {};
+                controls.kC = {};
+
+                uiCanvas.onmousemove = function (e) {
+                controls.mX = e.offsetX;
+                controls.mY = e.offsetY;
+                };
+
+                uiCanvas.onmousedown = function () {
+                if (!controls.mP) controls.mC = true;
+                controls.mP = true;
+                };
+
+                uiCanvas.onmouseup = function () {
+                controls.mP = false;
+                };
+
+                document.onkeydown = function (e) {
+                const key = normalizeKey(e);
+                if (controls.kH[key] !== true) {
+                    controls.kC[key] = true;
+                } else {
+                    controls.kC[key] = false;
+                }
+                controls.kH[key] = true;
+                };
+
+                document.onkeyup = function (e) {
+                const key = normalizeKey(e);
+                controls.kH[key] = false;
+                };
+
+                controls.update = function () {
+                controls.kC = {};
+                controls.mC = false;
+                };
+
+                function normalizeKey(e) {
+                if (e.key.length === 1) {
+                    return e.key.toLowerCase(); // letters & symbols
+                }
+                return e.key; // keep ArrowUp, Shift, Enter, etc.
+                }
+
+                return controls;
+            })({});
+            }
+        /* Rest */
+        
+        let menu = {
+            show:false,
+            prevState:false,
+            button: {
+                x:5,
+                y:5,
+                draw: function (x=0, y=0) {
+                    x += this.x;
+                    y += this.y;
+                    strokeWeight(2.5);
+                    fill(150, 150, 150);
+                    rect(0 + x, 0 + y, 50, 50, 5);
+                    fill(0, 0, 0);
+                    strokeWeight(2.5);
+                    line(10 + x, 15 + y, 40 + x, 15 + y);
+                    line(10 + x, 25 + y, 40 + x, 25 + y);
+                    line(10 + x, 35 + y, 40 + x, 35 + y);
+                },
+                update: function () {
+                    let click = (user.mX >= this.x && user.mX <= this.x + 50 && user.mY >= this.y && user.mY <= this.y + 50 && user.mC);
+                    if (click){
+                        menu.show = menu.show ? false : true;
+                    }
+                    console.log(menu.show)
+                }
+            },
+            // Add a property to track the current x position of the menu panel
+            panelX: -200, // start hidden
+            update: function() {
+                // Target x position for the menu panel
+                let targetX = this.show ? 0 : -200;
+                // Smoothly interpolate panelX toward targetX
+                this.panelX += (targetX - this.panelX) * 0.2;
+                // Draw the menu panel at its current position
+                fill(200,200,0)
+                rect(this.panelX-5, -5, 205, windowHeight+10, 5);
+                this.button.x = this.panelX + 205;
+
+                // options
+
+                fill(200,200,0);
+                rect(this.panelX + 15, 45, 50, 50);
+                fill(0,0,0);
+                textAlign(LEFT, TOP);
+                textSize(20);
+                text("Character Tracker", this.panelX + 20, 50);
+            },
+        };
+
+        function draw() {
+            background(220);
+            menu.button.draw();
+            menu.button.update();
+            menu.update();
+            user.update();
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+        }
+    </script>
+</body>
+</html>
