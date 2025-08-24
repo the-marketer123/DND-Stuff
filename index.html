@@ -99,8 +99,8 @@
                 },
                 update: function () {
                     // Adjust mouse position so it matches the translated menu
-                    let mouseXAdj = user.mX + window.scrollX;
-                    let mouseYAdj = user.mY + window.scrollY;
+                    let mouseXAdj = user.mX - window.scrollX;
+                    let mouseYAdj = user.mY - window.scrollY;
 
                     let click = (
                         mouseXAdj >= this.x && mouseXAdj <= this.x + 50 &&
@@ -120,7 +120,7 @@
                 // Counteract page scroll so menu always stays visible
                 push();
                 translate(window.scrollX, window.scrollY);
-                console.log(window.scrollX + ' ' + window.scrollY)
+
                 // Target x position for the menu panel
                 let targetX = this.show ? 0 : -200;
                 this.panelX += (targetX - this.panelX) * 0.2;
@@ -180,6 +180,47 @@
             },
 
         }
+        let activeEdit = null; // {charIndex, field, x, y, w, h}
+        let inputBox = null;
+        function startEditing(charIndex, field, x, y, w, h, initialValue) {
+            if (inputBox) inputBox.remove(); // clear old input
+            inputBox = document.createElement("input");
+            inputBox.type = "text";
+            inputBox.value = initialValue;
+            inputBox.style.position = "absolute";
+            inputBox.style.left = (x + window.scrollX) + "px";
+            inputBox.style.top = (y + window.scrollY) + "px";
+            inputBox.style.width = w + "px";
+            inputBox.style.fontSize = "16px";
+            document.body.appendChild(inputBox);
+            inputBox.focus();
+
+            activeEdit = {charIndex, field};
+
+            inputBox.onblur = () => {
+                commitEdit();
+            };
+            inputBox.onkeydown = (e) => {
+                if (e.key === "Enter") {
+                    commitEdit();
+                }
+            };
+        }
+
+        function commitEdit() {
+            if (!activeEdit || !inputBox) return;
+            let val = inputBox.value;
+            let char = scenes.list[0].handler.chars[activeEdit.charIndex];
+
+            // update right field
+            char[activeEdit.field] = (isNaN(val) ? val : Number(val)); 
+            // smart-cast numbers
+
+            inputBox.remove();
+            inputBox = null;
+            activeEdit = null;
+        }
+
         let scenes = {
             curScene:0,
             list:[
@@ -200,10 +241,8 @@
                             this.inventory= i;
                             this.spells= s;
                         },
-                        chars:[
-                            
-                        ],
-                        drawChar:function(x,y,char=new this.template){
+                        chars:[],
+                        drawChar:function(x,y,char=new this.template,index){
                             push();
                             translate(x,y);
                             strokeWeight(3);
@@ -250,12 +289,24 @@
 
                             textSize(17);
                             text("Race: "+ char.race, 7, h);
-
+                            if (user.mX>=x+57&&user.mX<=x+87&&user.mY>=y+h-10&&user.mY<=y+h&&user.mC) {
+                                startEditing(index,"race", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.race);
+                            }
                             h+=20;
                             text("Class: "+ char.class, 7, h);
+                            if (user.mX>=x+57&&user.mX<=x+87&&user.mY>=y+h-10&&user.mY<=y+h&&user.mC) {
+                                startEditing(index,"class", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.class);
+                            }
+
 
                             h+=20;
                             text("Mana: "+ char.mana + "/" + char.maxMana, 7, h);
+                            if (user.mX>=x+57&&user.mX<=x+77&&user.mY>=y+h-0&&user.mY<=y+h+10&&user.mC) {
+                                startEditing(index,"mana", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.mana);
+                            }
+                            if (user.mX>=x+85&&user.mX<=x+105&&user.mY>=y+h-0&&user.mY<=y+h+10&&user.mC) {
+                                startEditing(index,"mana", x+70-window.scrollX, h-2-window.scrollY, 120, 20, char.mana);
+                            }
 
                             h+=20;
                             text("Money: "+ char.money, 7, h);
@@ -297,18 +348,18 @@
                         draw: function(){
                             background(220);
                             let num = 0;
-                            this.chars.forEach(char=>{
-                                this.drawChar((num * 300) + 75, 50, char);
-                                num++;
+                            this.chars.forEach((char,i)=>{
+                                this.drawChar((i * 300) + 75, 50, char, i);
                             })
+
 
                         },
                         update: function(){
                             if (this.chars.length <= 0){
                                 this.chars.push(new this.template);
                                 this.chars.push(new this.template);
-                                //this.chars.push(new this.template);
-                                //this.chars.push(new this.template);
+                                this.chars.push(new this.template);
+                                this.chars.push(new this.template);
 
                                 let charCount = this.chars.length;
                                 let neededWidth = charCount * 300 + 150; 
@@ -343,8 +394,8 @@
             },
         };
         // ALWAYS END WITH MENU THEN USER
-        textAlign(LEFT, TOP);
         function draw() {
+            textAlign(LEFT, TOP);
             background(220);
             scenes.update();
             menu.update();    
