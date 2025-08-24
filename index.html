@@ -121,10 +121,17 @@
                 // options
 
                 fill(200,200,0);
-                rect(this.panelX + 15, 45, 50, 50);
-                fill(0,0,0);
+                strokeWeight(3);
+                stroke(100,100,0);
+                rect(this.panelX + 17, 47, 173, 30, 5);
+                stroke(0,0,0);
+                rect(this.panelX + 15, 45, 173, 30, 5);
                 textAlign(LEFT, TOP);
                 textSize(20);
+                strokeWeight(1);
+                fill(100,100,0);
+                text("Character Tracker", this.panelX + 22, 52);
+                fill(0,0,0);
                 text("Character Tracker", this.panelX + 20, 50);
             },
         };
