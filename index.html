@@ -114,7 +114,7 @@
                 // Smoothly interpolate panelX toward targetX
                 this.panelX += (targetX - this.panelX) * 0.2;
                 // Draw the menu panel at its current position
-                fill(200,200,0)
+                fill(200,200,240)
                 rect(this.panelX-5, -5, 205, windowHeight+10, 5);
                 this.button.x = this.panelX + 205;
 
@@ -126,7 +126,7 @@
                 fill(0,0,0);
                 text("menu", this.panelX + 70, 40);
 
-                fill(200,200,0);
+                fill(200,200,240);
                 strokeWeight(3);
                 stroke(100,100,0);
                 rect(this.panelX + 17, 87, 173, 30, 5);
@@ -140,7 +140,7 @@
                 fill(0,0,0);
                 text("Character Tracker", this.panelX + 20, 90);
 
-                fill(200,200,0);
+                fill(200,200,240);
                 strokeWeight(3);
                 stroke(100,100,0);
                 rect(this.panelX + 17, 137, 173, 30, 5);
