@@ -11,7 +11,8 @@
         html, body {
         margin: 0;
         padding: 0;
-        overflow: hidden;
+        /*overflow-x: auto;
+        /*overflow-y: auto;*/
         }
         canvas {
         display: block;
@@ -99,48 +100,62 @@
                     line(10 + x, 35 + y, 40 + x, 35 + y);
                 },
                 update: function () {
-                    let click = (user.mX >= this.x && user.mX <= this.x + 50 && user.mY >= this.y && user.mY <= this.y + 50 && user.mC);
-                    if (click){
-                        menu.show = menu.show ? false : true;
+                    // Adjust mouse position so it matches the translated menu
+                    let mouseXAdj = user.mX + window.scrollX;
+                    let mouseYAdj = user.mY + window.scrollY;
+
+                    let click = (
+                        mouseXAdj >= this.x && mouseXAdj <= this.x + 50 &&
+                        mouseYAdj >= this.y && mouseYAdj <= this.y + 50 &&
+                        user.mC
+                    );
+
+                    if (click) {
+                        menu.show = !menu.show;
                     }
-                    console.log(click);
                 }
+
             },
             // Add a property to track the current x position of the menu panel
             panelX: -200, // start hidden
-            update: function() {
+            update: function () {
+                // Counteract page scroll so menu always stays visible
+                push();
+                translate(window.scrollX, window.scrollY);
+                console.log(window.scrollX + ' ' + window.scrollY)
                 // Target x position for the menu panel
                 let targetX = this.show ? 0 : -200;
-                // Smoothly interpolate panelX toward targetX
                 this.panelX += (targetX - this.panelX) * 0.2;
-                // Draw the menu panel at its current position
-                fill(200,200,240)
-                rect(this.panelX-5, -5, 205, windowHeight+10, 5);
+
+                // Draw the menu panel
+                fill(200, 200, 240);
+                rect(this.panelX - 5, -5, 205, windowHeight + 10, 5);
                 this.button.x = this.panelX + 205;
+                this.button.y = 5;
 
-                // options
-
+                // options text
+                textAlign(LEFT, TOP);
+                textSize(20);                
                 strokeWeight(1);
-                fill(100,100,0);
+                stroke(0, 0, 0);
+                fill(100, 100, 0);
                 text("menu", this.panelX + 72, 42);
-                fill(0,0,0);
+                fill(0, 0, 0);
                 text("menu", this.panelX + 70, 40);
 
 
 
-                fill(200,200,240);
                 strokeWeight(3);
-                stroke(100,100,0);
+                fill(200, 200, 240);
+                stroke(100, 100, 0);
                 rect(this.panelX + 17, 87, 173, 30, 5);
-                stroke(0,0,0);
+                stroke(0, 0, 0);
                 rect(this.panelX + 15, 85, 173, 30, 5);
 
-                textAlign(LEFT, TOP);
-                textSize(20);
                 strokeWeight(1);
-                fill(100,100,0);
+                fill(100, 100, 0);
                 text("Character Tracker", this.panelX + 22, 92);
-                fill(0,0,0);
+                fill(0, 0, 0);
                 text("Character Tracker", this.panelX + 20, 90);
 
 
@@ -159,12 +174,15 @@
                 text("nothin else yet", this.panelX + 27, 142);
                 fill(0,0,0);
                 text("nothin else yet", this.panelX + 25, 140);
-                
-                menu.button.draw();
-                menu.button.update(); 
-            },
-        };
+           
+                // draw button
+                this.button.draw();
+                this.button.update();
 
+                pop();
+            },
+
+        }
         let scenes = {
             curScene:0,
             list:[
@@ -172,11 +190,57 @@
                     id: "char", //id
                     nid: 0,     //number id
                     handler: {
+                        // stats: health race class invent money mana spells
+                        template:function (h=100,mh=100,c="archer",r="human",m=10,ma=10,mma=10,i=[{id: "sword",}],s=[{id: "fireball",}]){
+                            this.health= h;
+                            this.maxHealth= mh;
+                            this.class= c;
+                            this.race = r;
+                            this.money= m;
+                            this.mana= ma;
+                            this.maxMana= mma;                         
+                            this.inventory= i;
+                            this.spells= s;
+                        },
+                        chars:[
+                            
+                        ],
+                        drawChar:function(x,y,char=new this.template){
+                            push();
+                            translate(x,y);
+                            fill(200,200,250);
+                            rect(0,0, 250, 625, 10)
+                            line(0,100,250,100);
+                            line(0,100,250,100);
+                            pop();
+                        },
                         draw: function(){
                             background(220);
+                            let num = 0;
+                            this.chars.forEach(char=>{
+                                this.drawChar((num * 300) + 75, 50, char);
+                                num++;
+                            })
+
                         },
                         update: function(){
+                            if (this.chars.length <= 0){
+                                this.chars.push(new this.template);
+                                this.chars.push(new this.template);
+                                this.chars.push(new this.template);
+                                this.chars.push(new this.template);
 
+                                let charCount = this.chars.length;
+                                let neededWidth = charCount * 300 + 150; 
+                                let neededHeight = 675; 
+
+                                // Expand canvas horizontally if needed, but at least as wide as window
+                                let finalWidth = Math.max(neededWidth, windowWidth);
+                                let finalHeight = Math.max(neededHeight, windowHeight);
+
+                                resizeCanvas(finalWidth, finalHeight);
+                            }
+                            
                         }
                     }
                 },
@@ -202,12 +266,27 @@
         function draw() {
             background(220);
             scenes.update();
-            menu.update();       
+            menu.update();    
             user.update();
         }
 
         function windowResized() {
-            resizeCanvas(windowWidth, windowHeight);
+            let scene = scenes.list[scenes.curScene];
+
+            if (scene.id !== "char") {
+                resizeCanvas(windowWidth, windowHeight);
+            } else {
+                // ✅ Calculate how wide canvas must be to fit all chars
+                let charCount = scene.handler.chars.length;
+                let neededWidth = charCount * 300 + 150; 
+                let neededHeight = 675; 
+
+                // Expand canvas horizontally if needed, but at least as wide as window
+                let finalWidth = Math.max(neededWidth, windowWidth);
+                let finalHeight = Math.max(neededHeight, windowHeight);
+
+                resizeCanvas(finalWidth, finalHeight);
+            }
         }
     </script>
 </body>
