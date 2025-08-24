@@ -126,12 +126,15 @@
                 fill(0,0,0);
                 text("menu", this.panelX + 70, 40);
 
+
+
                 fill(200,200,240);
                 strokeWeight(3);
                 stroke(100,100,0);
                 rect(this.panelX + 17, 87, 173, 30, 5);
                 stroke(0,0,0);
                 rect(this.panelX + 15, 85, 173, 30, 5);
+
                 textAlign(LEFT, TOP);
                 textSize(20);
                 strokeWeight(1);
@@ -140,12 +143,15 @@
                 fill(0,0,0);
                 text("Character Tracker", this.panelX + 20, 90);
 
+
+
                 fill(200,200,240);
                 strokeWeight(3);
                 stroke(100,100,0);
                 rect(this.panelX + 17, 137, 173, 30, 5);
                 stroke(0,0,0);
                 rect(this.panelX + 15, 135, 173, 30, 5);
+
                 textAlign(LEFT, TOP);
                 textSize(20);
                 strokeWeight(1);
@@ -157,12 +163,48 @@
             },
         };
 
+        let scenes = {
+            curScene:0,
+            list:[
+                {
+                    id: "char", //id
+                    nid: 0,     //number id
+                    handler: {
+                        draw: function(){
+
+                        },
+                        update: function(){
+
+                        }
+                    }
+                },
+            ],
+            update: function (){
+                let scene = this.list[this.curScene];
+                console.log(scene);
+                scene.handler.draw();
+                scene.handler.update();
+            },
+            swap: function (type, id) {
+                if (type === "nid") {
+                    this.curScene = id
+                } else if (type === "id") {
+                    this.list.forEach(e=>{
+                        if (e.id === id){
+                            this.curScene = e.nid
+                        }
+                    })
+                }
+            },
+        };
+
         function draw() {
             background(220);
             menu.button.draw();
             menu.button.update();
             menu.update();
             user.update();
+            scenes.update();
         }
 
         function windowResized() {
