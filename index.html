@@ -11,8 +11,6 @@
         html, body {
         margin: 0;
         padding: 0;
-        /*overflow-x: auto;
-        /*overflow-y: auto;*/
         }
         canvas {
         display: block;
@@ -134,7 +132,6 @@
                 this.button.y = 5;
 
                 // options text
-                textAlign(LEFT, TOP);
                 textSize(20);                
                 strokeWeight(1);
                 stroke(0, 0, 0);
@@ -191,7 +188,8 @@
                     nid: 0,     //number id
                     handler: {
                         // stats: health race class invent money mana spells
-                        template:function (h=100,mh=100,c="archer",r="human",m=10,ma=10,mma=10,i=[{id: "sword",}],s=[{id: "fireball",}]){
+                        template:function (n="guy",h=3,mh=3,c="archer",r="human",m=10,ma=10,mma=10,i=[{id: "sword",}],s=[{id: "fireball",}]){
+                            this.name= n,
                             this.health= h;
                             this.maxHealth= mh;
                             this.class= c;
@@ -208,10 +206,49 @@
                         drawChar:function(x,y,char=new this.template){
                             push();
                             translate(x,y);
+                            strokeWeight(3);
                             fill(200,200,250);
                             rect(0,0, 250, 625, 10)
-                            line(0,100,250,100);
-                            line(0,100,250,100);
+                            line(0,70,250,70);
+                            fill(0,0,0);
+                            textSize(50);
+                            text(char.name, 10, 10, 240)
+
+                            let h = 0; //keeps everything at the right height so nothing overlaps if its too long
+
+                            function heart(x,y,size){
+                                strokeWeight(2);
+                                beginShape();
+                                vertex(x, y);
+                                bezierVertex(x - size / 2, y - size / 2, x - size, y + size / 3, x, y + size);
+                                bezierVertex(x + size, y + size / 3, x + size / 2, y - size / 2, x, y);
+                                endShape(CLOSE);
+                            }
+
+                            let row = 0;
+                            for (let i = 0; i < char.health; i++){
+                                if (i - (15*row) >= 15){
+                                    row++;
+                                }                                
+                                fill(255,0,0);
+                                heart((i*15) - (225*row) + 15, 80 + (15*row), 10 )
+                            }
+                            fill(0,0,0);
+                            textSize(13);
+                            stroke(0,0,0);
+                            strokeWeight(1.25);
+                            text(char.health + "/" + char.maxHealth, 7, 105 + (15*row))
+                            h = 105 + (15*row) + 20;
+
+                            textSize(17);
+                            text("Race: "+ char.race, 7, h);
+                            h+=20;
+                            text("Class: "+ char.class, 7, h);
+                            h+=20;
+                            text("Mana: "+ char.mana + "/" + char.maxMana, 7, h);
+                            h+=20;
+                            text("Money: "+ char.money, 7, h);
+
                             pop();
                         },
                         draw: function(){
@@ -227,8 +264,8 @@
                             if (this.chars.length <= 0){
                                 this.chars.push(new this.template);
                                 this.chars.push(new this.template);
-                                this.chars.push(new this.template);
-                                this.chars.push(new this.template);
+                                //this.chars.push(new this.template);
+                                //this.chars.push(new this.template);
 
                                 let charCount = this.chars.length;
                                 let neededWidth = charCount * 300 + 150; 
@@ -263,6 +300,7 @@
             },
         };
         // ALWAYS END WITH MENU THEN USER
+        textAlign(LEFT, TOP);
         function draw() {
             background(220);
             scenes.update();
