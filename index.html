@@ -141,7 +141,7 @@
                 text("menu", this.panelX + 70, 40);
 
 
-
+                textAlign(LEFT, TOP);
                 strokeWeight(3);
                 fill(200, 200, 240);
                 stroke(100, 100, 0);
@@ -210,6 +210,7 @@
                             fill(200,200,250);
                             rect(0,0, 250, 625, 10)
                             line(0,70,250,70);
+                            line(0,575,250,575);
                             fill(0,0,0);
                             textSize(50);
                             text(char.name, 10, 10, 240)
@@ -240,14 +241,49 @@
                             text(char.health + "/" + char.maxHealth, 7, 105 + (15*row))
                             h = 105 + (15*row) + 20;
 
+                            fill(0,255,0)
+                            ellipse(225,h+140,12,12)
+                            line(222,h+140,228,h+140)
+                            line(225,h+137,225,h+143)
+
+                            fill(0);
+
                             textSize(17);
                             text("Race: "+ char.race, 7, h);
+
                             h+=20;
                             text("Class: "+ char.class, 7, h);
+
                             h+=20;
                             text("Mana: "+ char.mana + "/" + char.maxMana, 7, h);
+
                             h+=20;
                             text("Money: "+ char.money, 7, h);
+
+                            h+=20;
+                            text("Inventory: ", 7, h);
+                            h+=10;
+                            fill(150);
+                            rect(10,h,230,150,5);
+                            
+                            fill(0,255,0)
+                            ellipse(225,h+140,12,12)
+                            line(222,h+140,228,h+140)
+                            line(225,h+137,225,h+143)
+
+                            fill(0);
+                            h+=170;
+                            text("Spells: ", 7, h);
+                            h+=10;
+                            fill(150);
+                            rect(10,h,230,150,5);
+
+                            fill(0,255,0)
+                            ellipse(225,h+140,12,12)
+                            line(222,h+140,228,h+140)
+                            line(225,h+137,225,h+143)
+
+                            text();
 
                             pop();
                         },
