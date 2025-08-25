@@ -127,7 +127,7 @@
 
                 // Draw the menu panel
                 fill(200, 200, 240);
-                rect(this.panelX - 5, -5, 205, windowHeight + 10, 5);
+                rect(this.panelX - 805, -5, 1000, windowHeight + 10, 5);
                 this.button.x = this.panelX + 205;
                 this.button.y = 5;
 
@@ -180,47 +180,10 @@
             },
 
         }
+
+
         let activeEdit = null; // {charIndex, field, x, y, w, h}
         let inputBox = null;
-        function startEditing(charIndex, field, x, y, w, h, initialValue) {
-            if (inputBox) inputBox.remove(); // clear old input
-            inputBox = document.createElement("input");
-            inputBox.type = "text";
-            inputBox.value = initialValue;
-            inputBox.style.position = "absolute";
-            inputBox.style.left = (x + window.scrollX) + "px";
-            inputBox.style.top = (y + window.scrollY) + "px";
-            inputBox.style.width = w + "px";
-            inputBox.style.fontSize = "16px";
-            document.body.appendChild(inputBox);
-            inputBox.focus();
-
-            activeEdit = {charIndex, field};
-
-            inputBox.onblur = () => {
-                commitEdit();
-            };
-            inputBox.onkeydown = (e) => {
-                if (e.key === "Enter") {
-                    commitEdit();
-                }
-            };
-        }
-
-        function commitEdit() {
-            if (!activeEdit || !inputBox) return;
-            let val = inputBox.value;
-            let char = scenes.list[0].handler.chars[activeEdit.charIndex];
-
-            // update right field
-            char[activeEdit.field] = (isNaN(val) ? val : Number(val)); 
-            // smart-cast numbers
-
-            inputBox.remove();
-            inputBox = null;
-            activeEdit = null;
-        }
-
         let scenes = {
             curScene:0,
             list:[
@@ -242,6 +205,45 @@
                             this.spells= s;
                         },
                         chars:[],
+                        startEditing: function(charIndex, field, x, y, w, h, initialValue,add=false) {
+                            if (inputBox) inputBox.remove(); // clear old input
+                            inputBox = document.createElement("input");
+                            inputBox.type = "text";
+                            inputBox.value = initialValue;
+                            inputBox.style.position = "absolute";
+                            inputBox.style.left = (x + window.scrollX) + "px";
+                            inputBox.style.top = (y + window.scrollY) + "px";
+                            inputBox.style.width = w + "px";
+                            inputBox.style.fontSize = "16px";
+                            document.body.appendChild(inputBox);
+                            inputBox.focus();
+
+                            activeEdit = {charIndex, field,add};
+
+                            inputBox.onkeydown = (e) => {
+                                if (e.key === "Enter") {
+                                    this.commitEdit();
+                                }
+                            };
+                        },
+
+                        commitEdit: function() {                                
+                            if (!activeEdit || !inputBox) return;
+                            let val = inputBox.value;
+                            let char = scenes.list[0].handler.chars[activeEdit.charIndex];
+
+                            // update right field
+                            if (!activeEdit.add){
+                                char[activeEdit.field] = (isNaN(val) ? val : Number(val)); 
+                            } else {
+                                char[activeEdit.field].push({id: isNaN(val) ? val : Number(val)}); 
+                            }
+                            // smart-cast numbers
+
+                            inputBox.remove();
+                            inputBox = null;
+                            activeEdit = null;
+                        },
                         drawChar:function(x,y,char=new this.template,index){
                             push();
                             translate(x,y);
@@ -249,16 +251,23 @@
                             fill(200,200,250);
                             rect(0,0, 250, 625, 10)
                             line(0,70,250,70);
-                            line(0,575,250,575);
-                            fill(0,0,0);
                             textSize(50);
+                            if (user.mX>=x+5&&user.mX<=x+225&&user.mY>=y+5&&user.mY<=y+65) {
+                                noStroke();
+                                fill('rgba(255, 255, 255, 0.26)');
+                                rect(5,5,220,60,5);                                
+                                cursor(HAND);
+                                if (user.mC){
+                                    this.startEditing(index,"name", x+70-window.scrollX, y-2-window.scrollY, 120, 20, char.name);
+                                }
+                            }                            
+                            fill(0,0,0);
                             text(char.name, 10, 10, 240)
-                            if (user.mX>=x+10&&user.mX<=x+220&&user.mY>=y&&user.mY<=y+50&&user.mC) {
-                                startEditing(index,"name", x+70-window.scrollX, y-2-window.scrollY, 120, 20, char.name);
-                            }
+
 
                             let h = 0; //keeps everything at the right height so nothing overlaps if its too long
 
+                            stroke(0,0,0);
                             function heart(x,y,size){
                                 strokeWeight(2);
                                 beginShape();
@@ -280,8 +289,17 @@
                             textSize(13);
                             stroke(0,0,0);
                             strokeWeight(1.25);
-                            text(char.health + "/" + char.maxHealth, 7, 105 + (15*row))
-                            h = 105 + (15*row) + 20;
+                            text(char.health + "/" + char.maxHealth, 7, 95 + (15*row))
+
+                            h = 15*row+95;
+
+                            fill(255);
+                            ellipse(225,h+6,12,12);
+                            triangle(223,h+5,227,h+5,225,h+7);
+                            ellipse(225,h-3,12,12);
+                            triangle(223,h+1,227,h+1,225,h-1);
+
+                            h += 15;
 
                             fill(0,255,0)
                             ellipse(225,h+140,12,12)
@@ -290,48 +308,135 @@
 
                             fill(0);
 
+
                             textSize(17);
-                            text("Race: "+ char.race, 7, h);
-                            if (user.mX>=x+57&&user.mX<=x+87&&user.mY>=y+h&&user.mY<=y+h+10&&user.mC) {
-                                startEditing(index,"race", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.race);
+
+
+
+                            //race
+                            if (user.mX>=x+55&&user.mX<=x+245&&user.mY>=y+h-5&&user.mY<=y+h+20) {
+                                noStroke();
+                                fill('rgba(255, 255, 255, 0.25)');
+                                rect(55,h-5,190,25,5);
+                                cursor(HAND);
+                                if (user.mC){
+                                    this.startEditing(index,"race", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.race);
+                                }
                             }
-                            h+=20;
+                            fill(0);
+                            stroke(0);       
+                            text("Race: "+ char.race, 7, h,245);
+                            h+=25;
+
+
+
+                            // class
+                            if (user.mX>=x+55&&user.mX<=x+245&&user.mY>=y+h-5&&user.mY<=y+h+20) {
+                                noStroke();
+                                fill('rgba(255, 255, 255, 0.25)');
+                                rect(55,h-5,190,25,5);
+                                cursor(HAND);
+                                if (user.mC){
+                                    this.startEditing(index,"class", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.class);
+                                }
+                            }
+                            fill(0);
+                            stroke(0);
                             text("Class: "+ char.class, 7, h);
-                            if (user.mX>=x+57&&user.mX<=x+87&&user.mY>=y+h&&user.mY<=y+h+10&&user.mC) {
-                                startEditing(index,"class", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.class);
+                            h+=25;
+
+
+                            //mana
+                            if (user.mX>=x+57&&user.mX<=x+59+(10 * char.mana.toString().length)&&user.mY>=y+h-5&&user.mY<=y+h+20) {
+                                noStroke();
+                                fill('rgba(255, 255, 255, 0.25)');
+                                rect(57,h-5,2+10 * char.mana.toString().length,25,5);
+                                cursor(HAND);
+                                if (user.mC){
+                                    this.startEditing(index,"mana", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.mana);
+                                }
                             }
-
-
-                            h+=20;
+                            if (user.mX>=x+64+(10 * char.mana.toString().length)&&user.mX<=x+64+(10 * char.maxMana.toString().length)+(10 * char.mana.toString().length)&&user.mY>=y+h-5&&user.mY<=y+h+20) {
+                                noStroke();
+                                fill('rgba(255, 255, 255, 0.25)');
+                                rect(64+(10 * char.mana.toString().length),h-5,10 * char.maxMana.toString().length,25,5);
+                                cursor(HAND);
+                                if (user.mC){
+                                    this.startEditing(index,"maxMana", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.maxMana);
+                                }
+                            }                            
+                            
+                            fill(0);
+                            stroke(0);
                             text("Mana: "+ char.mana + "/" + char.maxMana, 7, h);
-                            if (user.mX>=x+57&&user.mX<=x+77&&user.mY>=y+h&&user.mY<=y+h+10&&user.mC) {
-                                startEditing(index,"mana", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.mana);
-                            }
-                            if (user.mX>=x+85&&user.mX<=x+105&&user.mY>=y+h&&user.mY<=y+h+10&&user.mC) {
-                                startEditing(index,"maxMana", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.maxMana);
-                            }
+                            h+=25;
 
-                            h+=20;
+
+
+                            //money
+                            if (user.mX>=x+65&&user.mX<=x+245&&user.mY>=y+h-5&&user.mY<=y+h+20) {
+                                noStroke();
+                                fill('rgba(255, 255, 255, 0.25)');
+                                rect(65,h-5,180,25,5);
+                                cursor(HAND);
+                                if(user.mC){
+                                    this.startEditing(index,"money", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.money);
+                                }
+                            }
+                            fill(0);
+                            stroke(0);
                             text("Money: "+ char.money, 7, h);
-                            if (user.mX>=x+65&&user.mX<=x+85&&user.mY>=y+h&&user.mY<=y+h+10&&user.mC) {
-                                startEditing(index,"money", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.money);
-                            }
+                            h+=25;
 
-                            h+=20;
+                            //inven
                             text("Inventory: ", 7, h);
-                            h+=10;
+                            h+=25;
                             fill(150);
                             rect(10,h,230,150,5);
                             
-                            fill(0,255,0)
-                            ellipse(225,h+140,12,12)
-                            line(222,h+140,228,h+140)
-                            line(225,h+137,225,h+143)
+                            fill(0,255,0);
+                            ellipse(225,h+140,12,12);
+                            line(222,h+140,228,h+140);
+                            line(225,h+137,225,h+143);
+
+                            noStroke();
+                            let nullCounter = 0;
+                            char.inventory.forEach((item,i)=>{    
+                                if (item!==null) {        
+                                    let j = i - nullCounter;  
+                                    noStroke();
+                                    fill(0);
+                                    text(item.id, 15, h+(25*j)+10);
+                                    strokeWeight(1);
+                                    stroke(0);
+                                    fill(255,0,0);
+                                    ellipse(225,h+15+(25*j),12,12);
+                                    line(222,h+15+(25*j),228,h+15+(25*j));
+                                    if (user.mX>=x+219&&user.mX<=x+231&&user.mY>=y+h+9+(25*j)&&user.mY<=y+h+21+(25*j)){
+                                        cursor(HAND);
+                                        if(user.mC){
+                                            char.inventory[i] = null
+                                        }
+                                    }
+                                } else {
+                                    nullCounter++;
+                                }
+                            });
+                            if (user.mX>=x+219&&user.mX<=x+231&&user.mY>=y+h+134&&user.mY<=y+h+144) {
+                                cursor(HAND);
+                                if (user.mC && char.inventory.length < 5 + nullCounter){
+                                    this.startEditing(index,"inventory", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, "New Item",true);
+                                }
+                            }
 
                             fill(0);
-                            h+=170;
+                            h+=175;
+
+
+                            //spells
+                            stroke(0);
                             text("Spells: ", 7, h);
-                            h+=10;
+                            h+=25;
                             fill(150);
                             rect(10,h,230,150,5);
 
@@ -340,14 +445,39 @@
                             line(222,h+140,228,h+140)
                             line(225,h+137,225,h+143)
 
-                            fill(0);
-                            textSize(12);
-                            strokeWeight(0.5);
-                            text("type here:", 5, 587);
+                            
+                            noStroke();
+                            let nullCounter2 = 0;
+                            char.spells.forEach((item,i)=>{    
+                                if (item!==null) {        
+                                    let j = i - nullCounter2;          
+                                    noStroke();
+                                    fill(0);
+                                    text(item.id, 15, h+(25*j)+10);
+                                    strokeWeight(1);
+                                    stroke(0);
+                                    fill(255,0,0);
+                                    ellipse(225,h+15+(25*j),12,12);
+                                    line(222,h+15+(25*j),228,h+15+(25*j));
+                                    if (user.mX>=x+219&&user.mX<=x+231&&user.mY>=y+h+9+(25*j)&&user.mY<=y+h+21+(25*j)){
+                                        cursor(HAND);
+                                        if(user.mC){
+                                            char.spells[i] = null
+                                        }
+                                    }
+                                } else {
+                                    nullCounter2++;
+                                }
+                            if (user.mX>=x+219&&user.mX<=x+231&&user.mY>=y+h+134&&user.mY<=y+h+144) {
+                                cursor(HAND);
+                                if (user.mC && char.spells.length < 5 + nullCounter2){
+                                    this.startEditing(index,"spells", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, "New Spell",true);
+                                }
+                            }
+                            });
+                            //if (){
 
-                            fill(150);
-                            strokeWeight(1.5);
-                            rect(10,590,230,25,5)
+                            //}
 
                             pop();
                         },
@@ -401,7 +531,8 @@
         };
         // ALWAYS END WITH MENU THEN USER
         function draw() {
-            //textAlign(LEFT, TOP);
+            cursor(ARROW);
+            textAlign(LEFT, TOP);
             background(220);
             scenes.update();
             menu.update();    
