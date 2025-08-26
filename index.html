@@ -289,15 +289,47 @@
                             textSize(13);
                             stroke(0,0,0);
                             strokeWeight(1.25);
+                            
+                            if (char.health > char.maxHealth) char.health = char.maxHealth;
+                            if (char.health > 300) char.health = char.maxHealth;
+                            if (char.maxHealth > 300) char.maxHealth = 300;
+
                             text(char.health + "/" + char.maxHealth, 7, 95 + (15*row))
+
+                            if (user.mX>=x+7&&user.mX<=x+8+(7 * char.health.toString().length)&&user.mY>=y+95+(15*row)&&user.mY<=y+105+(15*row)) {
+                                noStroke();
+                                fill('rgba(255, 255, 255, 0.25)');
+                                rect(7,95+(15*row),2+7 * char.health.toString().length,10,5);
+                                cursor(HAND);
+                                if (user.mC){
+                                    this.startEditing(index,"health", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.health);
+                                }
+                            }
+                            if (user.mX>=x+10+(7*char.health.toString().length)&&user.mX<=x+10+(7*char.health.toString().length)+(7*char.maxHealth.toString().length)&&user.mY>=y+95+(15*row)&&user.mY<=y+105+(15*row)) {
+                                noStroke();
+                                fill('rgba(255, 255, 255, 0.25)');
+                                rect(10+(7*char.health.toString().length),95+(15*row),2+7 * char.health.toString().length,10,5);
+                                cursor(HAND);
+                                if (user.mC){
+                                    this.startEditing(index,"maxHealth", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, char.maxHealth);
+                                }
+                            }         
+
 
                             h = 15*row+95;
 
+                            /*
                             fill(255);
                             ellipse(225,h+6,12,12);
                             triangle(223,h+5,227,h+5,225,h+7);
-                            ellipse(225,h-3,12,12);
-                            triangle(223,h+1,227,h+1,225,h-1);
+                            ellipse(225,h-9,12,12);
+                            triangle(223,h-7,227,h-7,225,h-9);
+
+                            ellipse(240,h+6,12,12);
+                            triangle(238,h+5,242,h+5,240,h+7);
+                            ellipse(240,h-9,12,12);
+                            triangle(238,h-7,242,h-7,240,h-9);
+                            */
 
                             h += 15;
 
