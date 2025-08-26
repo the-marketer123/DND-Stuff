@@ -244,7 +244,7 @@
                             inputBox = null;
                             activeEdit = null;
                         },
-                        drawChar:function(x,y,char=new this.template,index){
+                        drawChar:function(x,y,char=new this.template,index,offset){
                             push();
                             translate(x,y);
                             strokeWeight(3);
@@ -289,7 +289,7 @@
                             textSize(13);
                             stroke(0,0,0);
                             strokeWeight(1.25);
-                            
+
                             if (char.health > char.maxHealth) char.health = char.maxHealth;
                             if (char.health > 300) char.health = char.maxHealth;
                             if (char.maxHealth > 300) char.maxHealth = 300;
@@ -317,19 +317,6 @@
 
 
                             h = 15*row+95;
-
-                            /*
-                            fill(255);
-                            ellipse(225,h+6,12,12);
-                            triangle(223,h+5,227,h+5,225,h+7);
-                            ellipse(225,h-9,12,12);
-                            triangle(223,h-7,227,h-7,225,h-9);
-
-                            ellipse(240,h+6,12,12);
-                            triangle(238,h+5,242,h+5,240,h+7);
-                            ellipse(240,h-9,12,12);
-                            triangle(238,h-7,242,h-7,240,h-9);
-                            */
 
                             h += 15;
 
@@ -506,28 +493,51 @@
                                     this.startEditing(index,"spells", x+70-window.scrollX, y+h-2-window.scrollY, 120, 20, "New Spell",true);
                                 }
                             }
+                            fill(255,0,0);
+                            ellipse(240,615,12,12);
+                            line(237,615,243,615);
+                            if (user.mX>=x+234&&user.mX<=x+246&&user.mY>=y+609&&user.mY<=y+621) {
+                                cursor(HAND);
+                                if(user.mC){
+                                    this.chars[index] = null;
+                                    windowResized();
+                                }
+                            }
+
                             });
-                            //if (){
-
-                            //}
-
                             pop();
                         },
                         draw: function(){
                             background(220);
-                            let num = 0;
-                            this.chars.forEach((char,i)=>{
-                                this.drawChar((i * 300) + 75, 50, char, i);
-                            })
+                            let nullCounter = 0;
 
+                            this.chars.forEach((char,i)=>{
+                                if (char !== null){
+                                    let j = i - nullCounter;
+                                    this.drawChar((j * 300) + 75, 50, char, i, j);
+                                } else {
+                                    nullCounter ++;
+                                }
+                            })
+                            fill(0,255,0);
+                            let y = windowHeight/2;
+                            let x = (this.chars.length - nullCounter) * 300 + 75;
+                            ellipse(x,y,12,12);
+                            line(x-3,y,x+3,y);
+                            line(x,y-3,x,y+3);
+                            if (user.mX>=x-6&&user.mX<x+6&&user.mY>y-6&&user.mY<y+6){
+                                cursor(HAND);
+                                if(user.mC){
+                                    this.chars.push(new this.template);
+                                    windowResized();
+                                }
+                            }
 
                         },
                         update: function(){
                             if (this.chars.length <= 0){
                                 this.chars.push(new this.template);
-                                this.chars.push(new this.template);
-                                this.chars.push(new this.template);
-                                this.chars.push(new this.template);
+
 
                                 let charCount = this.chars.length;
                                 let neededWidth = charCount * 300 + 150; 
@@ -561,6 +571,7 @@
                 }
             },
         };
+
         // ALWAYS END WITH MENU THEN USER
         function draw() {
             cursor(ARROW);
@@ -573,12 +584,13 @@
 
         function windowResized() {
             let scene = scenes.list[scenes.curScene];
-
-            if (scene.id !== "char") {
-                resizeCanvas(windowWidth, windowHeight);
-            } else {
+            if (scene.id === "char") {
                 // ✅ Calculate how wide canvas must be to fit all chars
-                let charCount = scene.handler.chars.length;
+                let nullCounter = 0;
+                scene.handler.chars.forEach((char)=>{
+                    if (char === null) nullCounter++;
+                });
+                let charCount = scene.handler.chars.length + 1 - nullCounter;
                 let neededWidth = charCount * 300 + 150; 
                 let neededHeight = 675; 
 
@@ -587,7 +599,9 @@
                 let finalHeight = Math.max(neededHeight, windowHeight);
 
                 resizeCanvas(finalWidth, finalHeight);
-            }
+            } else {
+                resizeCanvas(windowWidth, windowHeight);
+            }    
         }
     </script>
 </body>
