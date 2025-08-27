@@ -211,6 +211,15 @@ otherstuff
                             this.spells= s;
                         },
                         chars:[],
+                        export:function(char){
+                            let json = JSON.stringify(char);
+                            return json;
+                        },
+                        import:function(input){
+                            let char = JSON.parse(input);
+                            this.chars.push(char);
+                            return char;
+                        },
                         startEditing: function(charIndex, field, x, y, w, h, initialValue,add=false) {
                             if (inputBox) inputBox.remove(); // clear old input
                             inputBox = document.createElement("input");
@@ -513,15 +522,6 @@ otherstuff
                             });
                             pop();
                         },
-                        export:function(char){
-                            let json = JSON.stringify(char);
-                            return json;
-                        },
-                        import:function(input){
-                            let char = JSON.parse(input);
-                            this.chars.push(char);
-                            return char;
-                        }
                         draw: function(){
                             background(220);
                             let nullCounter = 0;
