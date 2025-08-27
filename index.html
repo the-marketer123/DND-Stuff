@@ -161,7 +161,10 @@ otherstuff
                 fill(0, 0, 0);
                 text("Character Tracker", this.panelX + 20, 90);
 
-
+                if (user.mX>window.scrollX+this.panelX+20&&user.mX<window.scrollX+this.panelX+190
+                   && user.mY>90&&usere.mY<120){
+                    cursor(HAND);
+                }
 
                 fill(200,200,240);
                 strokeWeight(3);
@@ -174,9 +177,14 @@ otherstuff
                 textSize(20);
                 strokeWeight(1);
                 fill(100,100,0);
-                text("nothin else yet", this.panelX + 27, 142);
+                text("Import/Export", this.panelX + 27, 142);
                 fill(0,0,0);
-                text("nothin else yet", this.panelX + 25, 140);
+                text("Import/Export", this.panelX + 25, 140);
+
+                if (user.mX>window.scrollX+this.panelX+20&&user.mX<window.scrollX+this.panelX+112
+                    &&user.mY>140&&usere.mY<170){
+                    cursor(HAND);
+                }
            
                 // draw button
                 this.button.draw();
